@@ -43,7 +43,6 @@ function getPEJobs(page) {
         const token = yield getToken();
         let index = page * 10;
         const range = `${index - 10}-${index + 9 - 10}`;
-        console.log(range);
         try {
             const response = yield axios_1.default.get(`https://api.emploi-store.fr/partenaire/offresdemploi/v2/offres/search?publieeDepuis=31&motsCles=batiment&range=${range}`, {
                 headers: {
@@ -64,10 +63,32 @@ app.get("/jobs/:page", (req, res) => __awaiter(void 0, void 0, void 0, function*
     const page = req.params.page;
     const data = yield getPEJobs(page);
     const response = {
-        pages: data.resultats.length / 10,
         data: data.resultats
     };
     res.json(response);
+}));
+function getPEJobById(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const token = yield getToken();
+        try {
+            const response = yield axios_1.default.get(`https://api.emploi-store.fr/partenaire/offresdemploi/v2/offres/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token.access_token}`,
+                    "Content-Type": "application/json",
+                    Accept: "application/json"
+                }
+            });
+            return response.data;
+        }
+        catch (error) {
+            console.error(error);
+        }
+    });
+}
+app.get("/job/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const data = yield getPEJobById(id);
+    res.json(data);
 }));
 app.listen(port, err => {
     if (err) {
